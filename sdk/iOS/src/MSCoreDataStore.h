@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------------
 
 #import <Foundation/Foundation.h>
-#import <WindowsAzureMobileServices/WindowsAzureMobileServices.h>
+#import "WindowsAzureMobileServices.h"
 #import <CoreData/CoreData.h>
 
 /// The MSCoreDataStore class is for use when using the offline capabilities

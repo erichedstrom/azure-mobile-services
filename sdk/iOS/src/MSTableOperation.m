@@ -61,7 +61,7 @@
 -(NSDictionary *) serialize
 {
     NSDictionary *properties;
-    if (self.type == MSTableOperationDelete && self.item) {
+    if (self.item) {
         properties = @{ @"type": [NSNumber numberWithInteger:self.type],
                         @"item": self.item };
     } else {

@@ -139,13 +139,13 @@ static NSOperationQueue *pushQueue_;
         // should be combined with the previous one
         NSArray *pendingActions = [self.operationQueue getOperationsForTable:table item:itemId];
         MSTableOperation *operation = [pendingActions lastObject];
-        if (operation) {
-            condenseAction = [MSTableOperation condenseAction:action withExistingOperation:operation];
-            if (condenseAction == MSCondenseNotSupported) {
-                error = [self errorWithDescription:@"The requested operation is not allowed due to an already pending operation"
-                                      andErrorCode:MSSyncTableInvalidAction];
-            }
-        }
+//        if (operation) {
+//            condenseAction = [MSTableOperation condenseAction:action withExistingOperation:operation];
+//            if (condenseAction == MSCondenseNotSupported) {
+//                error = [self errorWithDescription:@"The requested operation is not allowed due to an already pending operation"
+//                                      andErrorCode:MSSyncTableInvalidAction];
+//            }
+//        }
         
         if (condenseAction == MSCondenseAddNew) {
             operation = [MSTableOperation pushOperationForTable:table type:action itemId:itemId];
@@ -188,6 +188,7 @@ static NSOperationQueue *pushQueue_;
 
         // Update the operation queue now
         if (condenseAction == MSCondenseAddNew) {
+            operation.item = item;
             [self.operationQueue addOperation:operation orError:&error];
         }
         else if (condenseAction == MSCondenseToDelete) {
