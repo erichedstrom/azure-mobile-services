@@ -26,12 +26,13 @@ namespace Microsoft.WindowsAzure.MobileServices.Sync
                           string queryKey,
                           MobileServiceTableQueryDescription query,
                           IDictionary<string, string> parameters,
+                          IEnumerable<string> relatedTables,
                           OperationQueue operationQueue,
                           MobileServiceSyncSettingsManager settings,
                           IMobileServiceLocalStore store,
                           MobileServiceRemoteTableOptions options,
                           CancellationToken cancellationToken)
-            : base(table, queryKey, query, context, operationQueue, settings, store, cancellationToken)
+            : base(table, queryKey, query, relatedTables, context, operationQueue, settings, store, cancellationToken)
         {
             this.options = options;
             this.parameters = parameters;
@@ -54,8 +55,12 @@ namespace Microsoft.WindowsAzure.MobileServices.Sync
             {
                 this.CancellationToken.ThrowIfCancellationRequested();
 
-                string odata = this.Query.ToODataString();
-                result = await this.Table.ReadAsync(odata, MobileServiceTable.IncludeDeleted(parameters), this.Table.Features);
+                string query = this.Query.ToODataString();
+                if (this.Query.UriPath != null)
+                {
+                    query = MobileServiceUrlBuilder.CombinePathAndQuery(this.Query.UriPath, query);
+                }
+                result = await this.Table.ReadAsync(query, MobileServiceTable.IncludeDeleted(parameters), this.Table.Features);
                 await this.ProcessAll(result.Values); // process the first batch
 
                 result = await FollowNextLinks(result);

@@ -230,10 +230,43 @@ namespace Microsoft.WindowsAzure.MobileServices.Test
 
             IMobileServiceTable table = service.GetTable("someTable");
 
-            await table.ReadAsync("http://wwww.contoso.com/about/?$filter=a eq b&$orderby=c");
+            await table.ReadAsync("http://www.test.com/about/?$filter=a eq b&$orderby=c");
 
             Assert.AreEqual("TU,LH", hijack.Request.Headers.GetValues("X-ZUMO-FEATURES").First());
-            Assert.AreEqual("http://wwww.contoso.com/about/?$filter=a eq b&$orderby=c", hijack.Request.RequestUri.ToString());
+            Assert.AreEqual("http://www.test.com/about/?$filter=a eq b&$orderby=c", hijack.Request.RequestUri.ToString());
+        }
+
+        [AsyncTestMethod]
+        public async Task ReadAsync_WithRelativeUri()
+        {
+            var data = new[]
+            {
+                new 
+                {
+                    ServiceUri = "http://www.test.com", 
+                    QueryUri = "/about?$filter=a eq b&$orderby=c", 
+                    RequestUri = "http://www.test.com/about?$filter=a eq b&$orderby=c"
+                },
+                new 
+                {
+                    ServiceUri = "http://www.test.com/", 
+                    QueryUri = "/about?$filter=a eq b&$orderby=c", 
+                    RequestUri = "http://www.test.com/about?$filter=a eq b&$orderby=c"
+                }
+            };
+
+            foreach (var item in data)
+            {
+                var hijack = new TestHttpHandler();
+                hijack.SetResponseContent("[{\"String\":\"Hey\"}]");
+                IMobileServiceClient service = new MobileServiceClient(item.ServiceUri, "secret...", hijack);
+
+                IMobileServiceTable table = service.GetTable("someTable");
+
+                await table.ReadAsync(item.QueryUri);
+
+                Assert.AreEqual(item.RequestUri, hijack.Request.RequestUri.ToString());
+            }
         }
 
         [AsyncTestMethod]

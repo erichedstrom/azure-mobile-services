@@ -29,10 +29,55 @@ namespace Microsoft.WindowsAzure.MobileServices.Test
 
             IMobileServiceTable<ToDo> table = service.GetTable<ToDo>();
 
-            await table.ReadAsync<ToDo>("http://wwww.contoso.com/about?$filter=a eq b&$orderby=c");
+            await table.ReadAsync<ToDo>("http://www.test.com/about?$filter=a eq b&$orderby=c");
 
             Assert.AreEqual("TT,LH", hijack.Request.Headers.GetValues("X-ZUMO-FEATURES").First());
-            Assert.AreEqual("http://wwww.contoso.com/about?$filter=a eq b&$orderby=c", hijack.Request.RequestUri.ToString());
+            Assert.AreEqual("http://www.test.com/about?$filter=a eq b&$orderby=c", hijack.Request.RequestUri.ToString());
+        }
+
+        [AsyncTestMethod]
+        public async Task ReadAsync_Throws_IfAbsoluteUriHostNameDoesNotMatch()
+        {
+            IMobileServiceClient service = new MobileServiceClient("http://www.test.com", "secret...", new TestHttpHandler());
+            IMobileServiceTable<ToDo> table = service.GetTable<ToDo>();
+
+            var ex = await AssertEx.Throws<ArgumentException>(async () => await table.ReadAsync<ToDo>("http://www.contoso.com/about?$filter=a eq b&$orderby=c"));
+
+            Assert.AreEqual(ex.Message, "The query uri must be on the same host as the Mobile Service.");
+        }
+
+        [AsyncTestMethod]
+        public async Task ReadAsync_WithRelativeUri_Generic()
+        {
+            var data = new[]
+            {
+                new 
+                {
+                    ServiceUri = "http://www.test.com", 
+                    QueryUri = "/about?$filter=a eq b&$orderby=c", 
+                    RequestUri = "http://www.test.com/about?$filter=a eq b&$orderby=c"
+                },
+                new 
+                {
+                    ServiceUri = "http://www.test.com/", 
+                    QueryUri = "/about?$filter=a eq b&$orderby=c", 
+                    RequestUri = "http://www.test.com/about?$filter=a eq b&$orderby=c"
+                }
+            };
+
+            foreach (var item in data)
+            {
+                var hijack = new TestHttpHandler();
+                hijack.SetResponseContent("[{\"col1\":\"Hey\"}]");
+                IMobileServiceClient service = new MobileServiceClient(item.ServiceUri, "secret...", hijack);
+
+                IMobileServiceTable<ToDo> table = service.GetTable<ToDo>();
+
+                await table.ReadAsync<ToDo>(item.QueryUri);
+
+                Assert.AreEqual("TT", hijack.Request.Headers.GetValues("X-ZUMO-FEATURES").First());
+                Assert.AreEqual(item.RequestUri, hijack.Request.RequestUri.ToString());
+            }
         }
 
         [AsyncTestMethod]
