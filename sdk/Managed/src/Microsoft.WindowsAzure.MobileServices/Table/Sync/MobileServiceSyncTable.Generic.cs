@@ -20,8 +20,8 @@ namespace Microsoft.WindowsAzure.MobileServices.Sync
         private MobileServiceTableQueryProvider queryProvider;
         private IMobileServiceTable<T> remoteTable;
 
-        public MobileServiceSyncTable(string tableName, MobileServiceClient client)
-            : base(tableName, client)
+        public MobileServiceSyncTable(string tableName, MobileServiceTableKind kind, MobileServiceClient client)
+            : base(tableName, kind, client)
         {
             this.remoteTable = client.GetTable<T>();
             this.queryProvider = new MobileServiceTableQueryProvider(this);
@@ -41,22 +41,6 @@ namespace Microsoft.WindowsAzure.MobileServices.Sync
             }
 
             return this.queryProvider.Execute(query);
-        }
-
-        public Task PullAsync<U>(string queryKey, IMobileServiceTableQuery<U> query, CancellationToken cancellationToken)
-        {
-            return PullAsync(queryKey, query, cancellationToken, new string[0]);
-        }
-
-        public Task PullAsync<U>(string queryKey, IMobileServiceTableQuery<U> query, CancellationToken cancellationToken, params string[] tableNames)
-        {
-            if (query == null)
-            {
-                throw new ArgumentNullException("query");
-            }
-            string queryString = this.queryProvider.ToODataString(query);
-
-            return this.PullAsync(queryKey, queryString, query.Parameters, cancellationToken, tableNames);
         }
 
         public Task PullAsync<U>(string queryKey, IMobileServiceTableQuery<U> query, bool pushOtherTables, CancellationToken cancellationToken)

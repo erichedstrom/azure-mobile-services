@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Authentication\MobileServiceTokenAuthentication.cs" />
     <Compile Include="Collections\MobileServiceCollection.cs" />
+    <Compile Include="Collections\MobileServiceCollectionEventArgs.cs" />
     <Compile Include="EnumValueAttribute.cs" />
     <Compile Include="Exceptions\MobileServiceConflictException.cs" />
     <Compile Include="Exceptions\MobileServiceInvalidOperationException.cs" />
@@ -92,6 +93,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Table\MobileServiceObjectReader.cs" />
+    <Compile Include="Table\Sync\Queue\Operations\MobileServiceTableKind.cs" />
     <Compile Include="Table\MobileServiceSystemColumns.cs" />
     <Compile Include="Table\MobileServiceSystemProperties.cs" />
     <Compile Include="Table\Query\IQueryResultEnumerable.cs" />

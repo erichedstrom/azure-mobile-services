@@ -22,15 +22,18 @@ namespace Microsoft.WindowsAzure.MobileServices.Sync
 
         public string TableName { get; private set; }
 
+        public MobileServiceTableKind Kind { get; private set; }
+
         public MobileServiceRemoteTableOptions SupportedOptions { get; set; }
 
-        public MobileServiceSyncTable(string tableName, MobileServiceClient client)
+        public MobileServiceSyncTable(string tableName, MobileServiceTableKind Kind, MobileServiceClient client)
         {
             Debug.Assert(tableName != null);
             Debug.Assert(client != null);
 
             this.MobileServiceClient = client;
             this.TableName = tableName;
+            this.Kind = Kind;
             this.syncContext = (MobileServiceSyncContext)client.SyncContext;
             this.SupportedOptions = MobileServiceRemoteTableOptions.All;
         }
@@ -40,27 +43,23 @@ namespace Microsoft.WindowsAzure.MobileServices.Sync
             return this.syncContext.ReadAsync(this.TableName, query);
         }
 
-        public Task PullAsync(string queryKey, string query, IDictionary<string, string> parameters, CancellationToken cancellationToken)
-        {
-            return PullAsync(queryKey, query, parameters, cancellationToken, new string[0]);
-        }
-
-        public Task PullAsync(string queryKey, string query, IDictionary<string, string> parameters, CancellationToken cancellationToken, params string[] tableNames)
+        public Task PullAsync(string queryKey, string query, IDictionary<string, string> parameters, MobileServiceObjectReader reader, CancellationToken cancellationToken, params string[] relatedTables)
         {
             ValidateQueryKey(queryKey);
-            return this.syncContext.PullAsync(this.TableName, queryKey, query, this.SupportedOptions, parameters, tableNames ?? new string[0], cancellationToken);
+
+            return this.syncContext.PullAsync(this.TableName, this.Kind, queryKey, query, this.SupportedOptions, parameters, relatedTables, reader, cancellationToken);
         }
 
         public Task PullAsync(string queryKey, string query, IDictionary<string, string> parameters, bool pushOtherTables, CancellationToken cancellationToken)
         {
             ValidateQueryKey(queryKey);
-            return this.syncContext.PullAsync(this.TableName, queryKey, query, this.SupportedOptions, parameters, pushOtherTables ? new string[0] : null, cancellationToken);
+            return this.syncContext.PullAsync(this.TableName, this.Kind, queryKey, query, this.SupportedOptions, parameters, pushOtherTables ? new string[0] : null, null, cancellationToken);
         }
 
         public Task PurgeAsync(string queryKey, string query, CancellationToken cancellationToken)
         {
             ValidateQueryKey(queryKey);
-            return this.syncContext.PurgeAsync(this.TableName, queryKey, query, cancellationToken);
+            return this.syncContext.PurgeAsync(this.TableName, this.Kind, queryKey, query, cancellationToken);
         }
 
         public async Task<JObject> InsertAsync(JObject instance)
@@ -77,7 +76,7 @@ namespace Microsoft.WindowsAzure.MobileServices.Sync
                 EnsureIdIsString(id);
             }
 
-            await this.syncContext.InsertAsync(this.TableName, (string)id, instance);
+            await this.syncContext.InsertAsync(this.TableName, this.Kind, (string)id, instance);
 
             return instance;
         }
@@ -87,7 +86,7 @@ namespace Microsoft.WindowsAzure.MobileServices.Sync
             string id = EnsureIdIsString(instance);
             instance = RemoveSystemPropertiesKeepVersion(instance);
 
-            await this.syncContext.UpdateAsync(this.TableName, id, instance);
+            await this.syncContext.UpdateAsync(this.TableName, this.Kind, id, instance);
         }
 
         public async Task DeleteAsync(JObject instance)
@@ -95,7 +94,7 @@ namespace Microsoft.WindowsAzure.MobileServices.Sync
             string id = EnsureIdIsString(instance);
             instance = RemoveSystemPropertiesKeepVersion(instance);
 
-            await this.syncContext.DeleteAsync(this.TableName, id, instance);
+            await this.syncContext.DeleteAsync(this.TableName, this.Kind, id, instance);
         }
 
         public Task<JObject> LookupAsync(string id)

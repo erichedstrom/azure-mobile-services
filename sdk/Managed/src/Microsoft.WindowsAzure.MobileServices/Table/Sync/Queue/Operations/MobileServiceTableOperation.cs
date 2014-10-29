@@ -14,10 +14,10 @@ namespace Microsoft.WindowsAzure.MobileServices.Sync
         // --- Persisted properties -- //
         public string Id { get; private set; }
         public abstract MobileServiceTableOperationKind Kind { get; }
+        public MobileServiceTableKind TableKind { get; private set; }
         public string TableName { get; private set; }
         public string ItemId { get; private set; }
         public JObject Item { get; set; }
-        public DateTime CreatedAt { get; private set; }
 
         public MobileServiceTableOperationState State { get; internal set; }
         public long Sequence { get; set; }
@@ -44,11 +44,11 @@ namespace Microsoft.WindowsAzure.MobileServices.Sync
             get { return false; }
         }
 
-        protected MobileServiceTableOperation(string tableName, string itemId)
+        protected MobileServiceTableOperation(string tableName, MobileServiceTableKind tableKind, string itemId)
         {
             this.Id = Guid.NewGuid().ToString();
             this.State = MobileServiceTableOperationState.Pending;
-            this.CreatedAt = DateTime.UtcNow;
+            this.TableKind = tableKind;
             this.TableName = tableName;
             this.ItemId = itemId;
             this.Version = 1;
@@ -124,6 +124,7 @@ namespace Microsoft.WindowsAzure.MobileServices.Sync
                 { "kind", 0 },
                 { "state", 0 },
                 { "tableName", String.Empty },
+                { "tableKind", 0 },
                 { "itemId", String.Empty },
                 { "item", String.Empty },
                 { MobileServiceSystemColumns.CreatedAt, DateTime.Now },
@@ -140,9 +141,9 @@ namespace Microsoft.WindowsAzure.MobileServices.Sync
                 { "kind", (int)this.Kind },
                 { "state", (int)this.State },
                 { "tableName", this.TableName },
+                { "tableKind", (int)this.TableKind },
                 { "itemId", this.ItemId },
                 { "item", this.Item != null && this.SerializeItemToQueue ? this.Item.ToString(Formatting.None) : null },
-                { MobileServiceSystemColumns.CreatedAt, this.CreatedAt },
                 { "sequence", this.Sequence },
                 { "version", this.Version }
             };
@@ -159,6 +160,7 @@ namespace Microsoft.WindowsAzure.MobileServices.Sync
 
             var kind = (MobileServiceTableOperationKind)obj.Value<int>("kind");
             string tableName = obj.Value<string>("tableName");
+            var tableKind = (MobileServiceTableKind)obj.Value<int?>("tableKind").GetValueOrDefault();
             string itemId = obj.Value<string>("itemId");
 
 
@@ -166,18 +168,17 @@ namespace Microsoft.WindowsAzure.MobileServices.Sync
             switch (kind)
             {
                 case MobileServiceTableOperationKind.Insert:
-                    operation = new InsertOperation(tableName, itemId); break;
+                    operation = new InsertOperation(tableName, tableKind, itemId); break;
                 case MobileServiceTableOperationKind.Update:
-                    operation = new UpdateOperation(tableName, itemId); break;
+                    operation = new UpdateOperation(tableName, tableKind, itemId); break;
                 case MobileServiceTableOperationKind.Delete:
-                    operation = new DeleteOperation(tableName, itemId); break;
+                    operation = new DeleteOperation(tableName, tableKind, itemId); break;
             }
 
             if (operation != null)
             {
                 operation.Id = obj.Value<string>(MobileServiceSystemColumns.Id);
                 operation.Sequence = obj.Value<long?>("sequence").GetValueOrDefault();
-                operation.CreatedAt = obj.Value<DateTime>(MobileServiceSystemColumns.CreatedAt);
                 operation.Version = obj.Value<long?>("version").GetValueOrDefault();
                 string itemJson = obj.Value<string>("item");
                 operation.Item = !String.IsNullOrEmpty(itemJson) ? JObject.Parse(itemJson) : null;
