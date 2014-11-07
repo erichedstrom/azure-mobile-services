@@ -140,6 +140,7 @@
 
 -(void) viewDidUnload
 {
+    [super viewDidUnload];
     self.loginView = nil;
 }
 
