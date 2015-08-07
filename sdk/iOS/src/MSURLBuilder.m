@@ -49,13 +49,14 @@ static NSString *const inlineCountAllPage = @"allpages";
         if (table.systemProperties & MSSystemPropertyUpdatedAt) {
             [properties addObject:MSSystemColumnUpdatedAt];
         }
-        if (table.systemProperties & MSSystemPropertyVersion) {
-            [properties addObject:MSSystemColumnVersion];
-        }
         if (table.systemProperties & MSSystemPropertyDeleted) {
             [properties addObject:MSSystemColumnDeleted];
         }
-        value = [properties componentsJoinedByString:@","];
+        if (table.systemProperties & MSSystemPropertyVersion) {
+            [properties addObject:MSSystemColumnVersion];
+        }
+        // Join the properties with "%2C" which is URL Friendly
+        value = [properties componentsJoinedByString:@"%2C"];
     }
     
     return [MSURLBuilder URLByAppendingQueryString:[@"__systemProperties=" stringByAppendingString:value] toURL:url];

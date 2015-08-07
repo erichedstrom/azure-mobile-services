@@ -59,9 +59,9 @@
 #pragma mark * Public Local Storage Management commands
 
 
--(void)pullWithQuery:(MSQuery *)query completion:(MSSyncBlock)completion
+-(void)pullWithQuery:(MSQuery *)query queryId:(NSString *)queryId completion:(MSSyncBlock)completion
 {
-    [self.client.syncContext pullWithQuery:query completion:completion];
+    [self.client.syncContext pullWithQuery:query queryId:queryId completion:completion];
 }
 
 -(void)purgeWithQuery:(MSQuery *)query completion:(MSSyncBlock)completion
@@ -74,6 +74,13 @@
     } else {
         [self.client.syncContext purgeWithQuery:query completion:completion];
     }
+}
+
+/// Purges all data, pending operations, operation errors, and metadata for the
+/// MSSyncTable from the local store.
+-(void)forcePurgeWithCompletion:(MSSyncBlock)completion
+{
+    [self.client.syncContext forcePurgeWithTable:self completion:completion];
 }
 
 #pragma mark * Public Read Methods

@@ -1,9 +1,56 @@
 # Azure Mobile Services Change Log
 
-### Version 2.0
+### Version 1.3.1
+**Managed SDK**
+- Update to latest version of sqlite pcl [ce1aa67](https://github.com/Azure/azure-mobile-services/commit/ce1aa67)
+- Fix iOS classic compilation issues [316a57a](https://github.com/Azure/azure-mobile-services/commit/316a57a)
+- Update Xamarin unified support for Xamarin.iOS 8.6
+[da537b1](https://github.com/Azure/azure-mobile-services/commit/da537b1)
+- Xamarin.iOS Unified API Support [d778c60](https://github.com/Azure/azure-mobile-services/commit/d778c60)
+- Relax queryId restrictions #521 [offline] 
+[3e2f645](https://github.com/Azure/azure-mobile-services/commit/3e2f645)
+- Work around for resource missing error on windows phone [offline]
+
+### Version 2.0.0 beta2
+**iOS SDK**
+- Added support for incremental sync
+- Added support for query parameters in pull operations
+- Fixed issue with login controller completing before animation completes
+- Added a method for force purge of local data
+- Added a helper method to return an NSDictionary from an NSManagedObject
+- Fixed issue with the __includeDeleted flag sending the wrong value
+
+### Version 2.0.0 beta1
+
 **iOS SDK**
 - Added support for following link headers returned from the .NET backend
 - **[Breaking]** Changed MSReadQueryBlock to return MSQueryResult instead of items and totalCount
+
+### Version 1.3 
+- allow underscore and hyphen in queryId [7d192a3](https://github.com/Azure/azure-mobile-services/commit/7d192a3)
+- added force option to purge data and pending operations on data [aa51d9f](https://github.com/Azure/azure-mobile-services/commit/aa51d9f)
+- delete errors with operation on cancel and collapse [372ba61](https://github.com/Azure/azure-mobile-services/commit/372ba61)
+- rename queryKey to queryId [93e59f7](https://github.com/Azure/azure-mobile-services/commit/93e59f7)
+- insert should throw if the item already exists [#491](https://github.com/Azure/azure-mobile-services/issues/491) [fc13891](https://github.com/Azure/azure-mobile-services/commit/fc13891)
+- **[Breaking]** Removed PullAsync overloads that do not take queryId [88cac8c](https://github.com/Azure/azure-mobile-services/commit/88cac8c)
+
+### Version 1.3 beta3
+**Managed SDK**
+- Improved the push failure error message [d49a72e](https://github.com/Azure/azure-mobile-services/commit/d49a72e)
+- Implement true upsert [c5b0b38](https://github.com/Azure/azure-mobile-services/commit/c5b0b38)
+- Use more fine grained types in sqlite store [de49712](https://github.com/Azure/azure-mobile-services/commit/de49712)
+- Speedup store table creation [eb7cc8d](https://github.com/Azure/azure-mobile-services/commit/eb7cc8d)
+- Allow query on member name datetime [7d831cd](https://github.com/Azure/azure-mobile-services/commit/7d831cd)
+- Make the sync handler optional as there is alternate way for handling sync errors [edc04e5](https://github.com/Azure/azure-mobile-services/commit/edc04e5)
+- Drop the unused createdat column in operations table [8a30df4](https://github.com/Azure/azure-mobile-services/commit/8a30df4)
+- Remove redundant overloads in interface and move them to extensions [d0a46b6](https://github.com/Azure/azure-mobile-services/commit/d0a46b6)
+- Support relative and absolute uri in pull same as table.read [c9d8e39](https://github.com/Azure/azure-mobile-services/commit/c9d8e39)
+- Allow relative URI in invokeapi [5b3c6b3](https://github.com/Azure/azure-mobile-services/commit/5b3c6b3)
+- Fixed the like implementation in sqlite store [77a0180](https://github.com/Azure/azure-mobile-services/commit/77a0180)
+- Purge should forget the deltatoken [18f1803](https://github.com/Azure/azure-mobile-services/commit/18f1803)
+- Renamed fromServer to ignoreMissingColumns [8b047eb](https://github.com/Azure/azure-mobile-services/commit/8b047eb)
+- **[Breaking]** Removed PullAsync overloads that do not take queryKey [d4ff784](https://github.com/Azure/azure-mobile-services/commit/d4ff784)
+- Save tableKind in the errors table [23f2ef0](https://github.com/Azure/azure-mobile-services/commit/23f2ef0)
 
 ### Version 1.3 beta2
 **Managed SDK**

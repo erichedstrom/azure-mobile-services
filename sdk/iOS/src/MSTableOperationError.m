@@ -75,6 +75,7 @@
     operation_ = operation.type;
     itemId_ = [operation.itemId copy];
     item_ = [item copy];
+    operationId_ = operation.operationId;
     
     return self;
 }
@@ -111,7 +112,7 @@
             @"operation": [NSNumber numberWithInteger:self.operation],
             @"itemId": self.itemId,
             @"statusCode": [NSNumber numberWithInteger:self.statusCode]
-        } mutableCopy];
+    } mutableCopy];
     
     if (self.item) {
         [properties setValue:self.item forKey:@"item"];
@@ -132,7 +133,7 @@
         data = [serializer dataFromItem:properties idAllowed:YES ensureDictionary:NO removeSystemProperties:NO orError:&serializeError];
     }
         
-    return @{ @"id": self.guid, @"properties": data };
+    return @{ @"id": self.guid, @"operationId": [NSNumber numberWithInteger:self.operationId], @"tableKind": @0, @"properties": data };
 }
 
 #pragma mark - Error Resolution
