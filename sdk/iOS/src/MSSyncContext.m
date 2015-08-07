@@ -142,6 +142,8 @@ static NSOperationQueue *pushQueue_;
         // should be combined with the previous one
         NSArray *pendingActions = [self.operationQueue getOperationsForTable:table item:itemId];
         MSTableOperation *operation = [pendingActions lastObject];
+      /* EMH don't condense actions because we are storing the operation content with the operation, not a separate table for
+       * each entity
         if (operation) {
             condenseAction = [MSTableOperation condenseAction:action withExistingOperation:operation];
             if (condenseAction == MSCondenseNotSupported) {
@@ -149,7 +151,8 @@ static NSOperationQueue *pushQueue_;
                                       andErrorCode:MSSyncTableInvalidAction];
             }
         }
-        
+       */
+
         if (condenseAction == MSCondenseAddNew) {
             operation = [MSTableOperation pushOperationForTable:table type:action itemId:itemId];
             operation.operationId = self.operationSequence;
@@ -201,6 +204,7 @@ static NSOperationQueue *pushQueue_;
         
         // Update the operation queue now
         if (condenseAction == MSCondenseAddNew) {
+            operation.item = item;
             [self.operationQueue addOperation:operation orError:&error];
         }
         else if (condenseAction == MSCondenseToDelete) {

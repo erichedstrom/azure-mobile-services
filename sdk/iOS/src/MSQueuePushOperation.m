@@ -110,7 +110,7 @@
     NSError *error;
     
     // Read the item from local store
-    if (operation.type != MSTableOperationDelete) {
+    if (!operation.item && operation.type != MSTableOperationDelete) {
         operation.item = [self.syncContext.dataSource readTable:operation.tableName withItemId:operation.itemId orError:&error];
     }
     
