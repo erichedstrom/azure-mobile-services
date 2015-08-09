@@ -171,7 +171,9 @@
             // Determine if table-item operation is dirty (if so, ignore this operations response)
             // and condense any table-item logic since new actions can come in while this one is outgoing
             NSError *condenseError;
+          /*
             didCondense = [self.syncContext.operationQueue condenseOperation:operation orError:&condenseError];
+           */
             if (condenseError) {
                 self.error = [self errorWithDescription:@"Push aborted due to failure to condense operations in the store"
                                                    code:MSPushAbortedDataSource
