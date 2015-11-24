@@ -3,6 +3,11 @@
 // ----------------------------------------------------------------------------
 
 #import "MSCoreDataStore.h"
+#import "MSTable.h"
+#import "MSSyncTable.h"
+#import "MSQuery.h"
+#import "MSSyncContextReadResult.h"
+#import "MSError.h"
 
 NSString *const SystemColumnPrefix = @"__";
 NSString *const StoreSystemColumnPrefix = @"ms_";
@@ -21,8 +26,8 @@ NSString *const StoreDeleted = @"ms_deleted";
 {
     self = [super init];
     if (self) {
-        self.context = context;
-		self.handlesSyncTableOperations = YES;
+        _handlesSyncTableOperations = YES;
+        _context = context;
     }
     return self;
 }
@@ -64,13 +69,7 @@ NSString *const StoreDeleted = @"ms_deleted";
     NSManagedObject *item = [results firstObject];
     
     if (item && asDictionary) {
-        
-        NSDictionary *result = [item dictionaryWithValuesForKeys:nil];
-
-        // The type of |result| is |NSKnownKeysDictionary|, an undocumented subclass of |NSMutableDictionary|.
-        // For it to work like a regular |NSMutableDictionary| we need to copy the contents into an
-        // |NSMutableDictionary| instance OR into an |NSDictionary| instance and then make a mutable copy.
-        return [NSDictionary dictionaryWithDictionary:result];
+        return [MSCoreDataStore tableItemFromManagedObject:item];
     }
     
     return item;

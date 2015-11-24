@@ -165,7 +165,7 @@
                           [NSString stringWithFormat:@"https%@",substring]];
         }
 
-        CGRect frame = [[UIScreen mainScreen] applicationFrame];
+        CGRect frame = [[UIScreen mainScreen] bounds];
         NSURL *start = [baseUrl URLByAppendingPathComponent:
                         [NSString stringWithFormat:@"login/%@", self.provider]];
         NSURL *end = [baseUrl URLByAppendingPathComponent:@"login/done"];
@@ -273,8 +273,7 @@
         // If there was a token string, deserialize it into a user or if
         // there was an error string, read the error message from it
         if (tokenString) {
-            NSString *unencodedTokenString = [tokenString
-                stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            NSString *unencodedTokenString = [tokenString stringByRemovingPercentEncoding];
             
             NSData *tokenData = [unencodedTokenString
                                  dataUsingEncoding:NSUTF8StringEncoding];
@@ -283,8 +282,7 @@
                                                              orError:&localError];
         }
         else if (errorString) {
-            NSString *unencodedErrorString = [errorString
-                stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            NSString *unencodedErrorString = [errorString stringByRemovingPercentEncoding];
             
             localError = [self errorWithDescription:unencodedErrorString
                                        andErrorCode:MSLoginFailed];

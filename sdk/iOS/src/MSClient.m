@@ -78,10 +78,12 @@
 +(MSClient *) clientWithApplicationURLString:(NSString *)urlString
                            applicationKey:(NSString *)key
 {
-    // NSURL will be nil for non-percent escaped url strings so we have to
-    // percent escape here
-    NSString  *urlStringEncoded =
-    [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    // NSURL will be nil for non-percent escaped url strings so we have to percent escape here
+    NSMutableCharacterSet *set = [[NSCharacterSet URLPathAllowedCharacterSet] mutableCopy];
+    [set formUnionWithCharacterSet:[NSCharacterSet URLHostAllowedCharacterSet]];
+    [set formUnionWithCharacterSet:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    
+    NSString *urlStringEncoded = [urlString stringByAddingPercentEncodingWithAllowedCharacters:set];
     
     NSURL *url = [NSURL URLWithString:urlStringEncoded];
     return [MSClient clientWithApplicationURL:url applicationKey:key];
@@ -138,7 +140,7 @@
     
     // Filter clients should inherit the same sync context
     newClient.syncContext = self.syncContext;
-    
+
     // Either copy or create a new filters array
     NSMutableArray *filters = [self.filters mutableCopy];
     if (!filters) {
@@ -275,7 +277,7 @@
                                                                             
     client.currentUser = [self.currentUser copyWithZone:zone];
     client.filters = [self.filters copyWithZone:zone];
-
+	
     return client;
 }
 
